@@ -1,15 +1,23 @@
 (function(w, d){
   'use strict';
   w.lazyYT = function() {
-    var divs = w.document.getElementsByTagName('div');
+    var divs = w.document.getElementsByTagName('div'),
+    atts = {};
 
     for(var i = 0, dl = divs.length; i < dl; i++){
       if(divs[i].className.match(/(?:\s|^)(lazyYT)(?:\s|$)/)){
-        var div = divs[i],
-        width = div.getAttribute('data-width') || '480',
-        height = div.getAttribute('data-height') || '360',
-        id = div.getAttribute('data-youtube-id') || 'dQw4w9WgXcQ',
-        oReq = new XMLHttpRequest(),
+        var div = divs[i];
+        for(var j = 0, at = Array.prototype.slice.call(div.attributes), atLength = at.length; j < atLength; j++){
+          if(at[j].name.match(/^data-youtube/)){
+            atts[at[j].name.substr(13)] = at[j].value;
+          }
+        }
+        atts.width = atts.width || 480;
+        atts.height = atts.height || 360;
+        atts.id = atts.id || 'dQw4w9WgXcQ';
+        atts.autoplay = atts.autoplay || 1;
+
+        var oReq = new XMLHttpRequest(),
         titleP = d.createElement('p'),
         playButton = d.createElement('img'),
         videoEmbed = d.createElement('iframe'),
@@ -44,20 +52,20 @@
         }(div, videoEmbed));
 
         oReq.onload = handleYouTubeData;
-        oReq.open('get', 'https://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json', false);
+        oReq.open('get', 'https://gdata.youtube.com/feeds/api/videos/' + atts.id + '?v=2&alt=json', false);
         oReq.send();
 
         div.style['position'] = 'relative';
-        div.style['width'] = width + 'px';
-        div.style['height'] = height + 'px';
-        div.style['background'] = 'url(http://img.youtube.com/vi/' + id + '/0.jpg) center center no-repeat';
+        div.style['width'] = atts.width + 'px';
+        div.style['height'] = atts.height + 'px';
+        div.style['background'] = 'url(http://img.youtube.com/vi/' + atts.id + '/0.jpg) center center no-repeat';
         div.style['cursor'] = 'pointer';
         div.style['-webkit-background-size'] = 'cover';
         div.style['-moz-background-size'] = 'cover';
         div.style['-o-background-size'] = 'cover';
         div.style['background-size'] = 'cover';
 
-        titleP.id = 'laztYT-title-' + id;
+        titleP.id = 'laztYT-title-' + atts.id;
         titleP.className = 'lazyYT-title';
         titleP.style.setProperty('z-index', '100', 'important');
         titleP.style.setProperty('color', '#fff', 'important');
@@ -85,9 +93,14 @@
         div.appendChild(playButton);
         div.className += ' lazyYT-image-loaded';
 
-        videoEmbed.width = width;
-        videoEmbed.height = height;
-        videoEmbed.src = '//www.youtube.com/embed/' + id + '?autoplay=1';
+        videoEmbed.width = atts.width;
+        videoEmbed.height = atts.height;
+        videoEmbed.src = '//www.youtube.com/embed/' + atts.id + '?';
+        for(var key in atts){
+          if('id' !== key && 'width' !== key && 'height' !== key){
+            videoEmbed.src += key + '=' + atts[key] + '&';
+          }
+        }
         videoEmbed.frameborder = 0;
         videoEmbed.setAttribute('allowfullscreen', '');
 
