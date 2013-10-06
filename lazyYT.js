@@ -1,12 +1,12 @@
 (function(w, d){
   'use strict';
   w.lazyYT = function() {
-    var divs = w.document.getElementsByTagName('div'),
-    atts = {};
+    var divs = w.document.getElementsByTagName('div');
 
     for(var i = 0, dl = divs.length; i < dl; i++){
       if(divs[i].className.match(/(?:\s|^)(lazyYT)(?:\s|$)/)){
-        var div = divs[i];
+        var div = divs[i],
+        atts = {};
         for(var j = 0, at = Array.prototype.slice.call(div.attributes), atLength = at.length; j < atLength; j++){
           if(at[j].name.match(/^data-youtube/)){
             atts[at[j].name.substr(13)] = at[j].value;
